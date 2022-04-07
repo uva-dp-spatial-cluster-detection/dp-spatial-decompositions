@@ -18,10 +18,15 @@ class Point(typing.NamedTuple):
 
 
 class QuadTreeNode:
-    count: int = 0
+    # TODO: question: does rounding this to an integer produce better results?
+    count: float = 0.0
     """Number of points lying inside of this node's rectangle.
     """
 
+    height: int
+    """
+    Maximum number of edges between this node and a leaf.
+    """
     rect: Rectangle
     """
     Rectangle represented by this QuadTreeNode.
@@ -57,6 +62,7 @@ class QuadTreeNode:
 
         self.rect = rect
         self.center = Point((rect.xmin + rect.xmax) / 2, (rect.ymin + rect.ymax) / 2)
+        self.height = height
 
         if height > 0:
             self.child_ne = QuadTreeNode(
