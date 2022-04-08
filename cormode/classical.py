@@ -3,18 +3,7 @@
 
 import typing
 from shapely import geometry
-
-
-class Rectangle(typing.NamedTuple):
-    xmin: float
-    ymin: float
-    xmax: float
-    ymax: float
-
-
-class Point(typing.NamedTuple):
-    x: float
-    y: float
+from cormode import Rectangle, Point
 
 
 class QuadTreeNode:

@@ -5,7 +5,27 @@ from turtle import shape
 from shapely import geometry
 import numpy as np
 import typing
-from cormode.classical import Point
+from cormode import Point
+
+
+def generate_points_no_cluster(
+    entire_region: geometry.Polygon,
+    lambda_background: float,
+) -> typing.List[Point]:
+    background_area = entire_region.area
+
+    points = []
+
+    count = np.random.poisson(lambda_background * background_area)
+    while len(points) < count:
+        point_x = np.random.uniform(entire_region.bounds[0], entire_region.bounds[2])
+        point_y = np.random.uniform(entire_region.bounds[1], entire_region.bounds[3])
+
+        shapely_point = geometry.Point(point_x, point_y)
+        if entire_region.contains(shapely_point):
+            points.append(shapely_point)
+
+    return points
 
 
 def generate_points_single_cluster(
