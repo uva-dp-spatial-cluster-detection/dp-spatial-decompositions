@@ -56,7 +56,7 @@ class QuadTreeNode:
         """Recursively builds a quadtree of a given height.
 
         Args:
-            extents (typing.Tuple[Extent, Extent], optional): Extent of this node, i.e., the minimum/maximum x and y values it will contain. Defaults to (Extent(0.0, 1.0), Extent(0.0, 1.0)).
+            rect (Rectangle): Rectangle representing the bounds of this QuadTreeNode. Defaults to Rectangle(0, 0, 1, 1).
             height (int, optional): Number of edges from node to any given leaf. Defaults to 0.
         """
 
