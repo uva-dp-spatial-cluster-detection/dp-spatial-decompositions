@@ -23,7 +23,7 @@ def generate_points_no_cluster(
 
         shapely_point = geometry.Point(point_x, point_y)
         if entire_region.contains(shapely_point):
-            points.append(shapely_point)
+            points.append(Point(point_x, point_y))
 
     return points
 
@@ -70,7 +70,7 @@ def generate_points_single_cluster(
         if entire_region.contains(shapely_point) and not cluster_region.contains(
             shapely_point
         ):
-            points.append((point_x, point_y))
+            points.append(Point(point_x, point_y))
             bg_generated += 1
 
     # how many cluster points should we generate?
@@ -88,7 +88,7 @@ def generate_points_single_cluster(
         if entire_region.contains(shapely_point) and cluster_region.contains(
             shapely_point
         ):
-            points.append((point_x, point_y))
+            points.append(Point(point_x, point_y))
             cluster_generated += 1
 
     return points
