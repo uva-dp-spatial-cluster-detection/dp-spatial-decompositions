@@ -71,6 +71,9 @@ def make_private_quadtree(
             nonprivate_node.count, sensitivity=1, epsilon=level_epsilon
         )
 
+        # keep track of this node's epsilon
+        private_node.epsilon = level_epsilon
+
         # if there are children:
         if not private_node.is_leaf:
             # recurse on each of them
