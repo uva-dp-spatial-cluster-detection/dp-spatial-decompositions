@@ -24,6 +24,9 @@ class QuadTreeNode:
     """Centerpoint of this node's rectangle.
     """
 
+    parent: typing.Optional["QuadTreeNode"]
+    """Parent node of this QuadTreeNode, if it exists.
+    """
     child_ne: typing.Optional["QuadTreeNode"] = None
     """Northeastern child of this QuadTreeNode, if it exists.
     """
@@ -37,10 +40,16 @@ class QuadTreeNode:
     """Southwestern child of this QuadTreeNode, if it exists.
     """
 
+    epsilon: typing.Optional[float] = None
+    """Epsilon associated with this level of the tree, if this node has been
+    privatized. Used to reduce variance in query responses.
+    """
+
     def __init__(
         self,
         rect: Rectangle = Rectangle(0, 0, 1, 1),
         height: int = 0,
+        parent: "QuadTreeNode" = None,
     ):
         """Recursively builds a quadtree of a given height.
 
@@ -52,6 +61,7 @@ class QuadTreeNode:
         self.rect = rect
         self.center = Point((rect.xmin + rect.xmax) / 2, (rect.ymin + rect.ymax) / 2)
         self.height = height
+        self.parent = parent
 
         if height > 0:
             self.child_ne = QuadTreeNode(
@@ -62,6 +72,7 @@ class QuadTreeNode:
                     self.rect.ymax,
                 ),
                 height=height - 1,
+                parent=self,
             )
             self.child_se = QuadTreeNode(
                 rect=Rectangle(
@@ -71,6 +82,7 @@ class QuadTreeNode:
                     self.center.y,
                 ),
                 height=height - 1,
+                parent=self,
             )
             self.child_nw = QuadTreeNode(
                 rect=Rectangle(
@@ -80,6 +92,7 @@ class QuadTreeNode:
                     self.rect.ymax,
                 ),
                 height=height - 1,
+                parent=self,
             )
             self.child_sw = QuadTreeNode(
                 rect=Rectangle(
@@ -89,6 +102,7 @@ class QuadTreeNode:
                     self.center.y,
                 ),
                 height=height - 1,
+                parent=self,
             )
 
     @property
@@ -100,7 +114,7 @@ class QuadTreeNode:
     @property
     def children(self) -> typing.Optional[typing.List["QuadTreeNode"]]:
         if self.is_leaf:
-            return None
+            return []
         else:
             return [self.child_ne, self.child_nw, self.child_sw, self.child_se]
 
