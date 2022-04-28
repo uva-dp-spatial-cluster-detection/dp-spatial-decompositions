@@ -57,7 +57,7 @@ def make_private_quadtree(
         elif budget_strategy == BudgetStrategy.GEOMETRIC:
             # ugly formula, taken from Cormode et al. pp. 5
             level_epsilon = (
-                2 ** ((height - depth) / 3)
+                2 ** (depth / 3)
                 * epsilon_total
                 * ((2 ** (1 / 3) - 1) / (2 ** ((height + 1) / 3) - 1))
             )
