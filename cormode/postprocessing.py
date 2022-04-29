@@ -75,7 +75,7 @@ def build_ols_tree(tree: QuadTreeNode) -> QuadTreeNode:
     height = 0  # leaves have height of zero
     while node:
         # from Lemma 4, pp.6 of Cormode et al.
-        next_e = e_array[-1] + _QUADTREE_FANOUT**height + node.epsilon**2
+        next_e = e_array[-1] + _QUADTREE_FANOUT**height * node.epsilon**2
         e_array.append(next_e)
 
         node = node.parent
@@ -93,16 +93,12 @@ def build_ols_tree(tree: QuadTreeNode) -> QuadTreeNode:
     # Phase I: top-down traversal
     # compute values of alpha from top down
 
-    # list of leaf nodes
-    leaves: typing.List[_WrappedQuadTreeNode] = []
-
     def compute_leaves_z_value(node: _WrappedQuadTreeNode, parent_alpha: float = 0):
         alpha = (
             parent_alpha + (node.wrapped_node.epsilon**2) * node.wrapped_node.count
         )
         if node.is_leaf:
             node.z_value = alpha
-            leaves.append(node)  # save list of leaves for next step
         else:
             for child in node.children:
                 compute_leaves_z_value(child, parent_alpha=alpha)
@@ -113,21 +109,14 @@ def build_ols_tree(tree: QuadTreeNode) -> QuadTreeNode:
     # performs a reverse level-order traversal
     # each node adds its Z value to its parent's Z value
 
-    traversal_queue = leaves
-    while traversal_queue:
-        # get a node
-        next_node = traversal_queue.pop(0)
+    def compute_internal_z_values(node):
+        if not node.is_leaf:
+            node.z_value = 0
+            for child in node.children:
+                compute_internal_z_values(child)
+                node.z_value += child.z_value
 
-        if next_node.parent is None:
-            break
-
-        # add its z value to the parents' z value
-        next_node.parent.z_value += next_node.z_value
-
-        # make sure we only enqueue the parent once for each child
-        # achieve this by only letting NE child enqueue parent
-        if next_node == next_node.parent.child_ne:
-            traversal_queue.append(next_node.parent)
+    compute_internal_z_values(wrapped_tree)
 
     # Phase III: top-down traversal
 
@@ -139,14 +128,13 @@ def build_ols_tree(tree: QuadTreeNode) -> QuadTreeNode:
         ols_tree_node: QuadTreeNode, wrapped_tree_node: _WrappedQuadTreeNode, node_F=0
     ):
         # node's height is the number of edges from it to leaf
-        # so its level is its height plus one
-        node_level = ols_tree_node.height + 1
+        height = ols_tree_node.height
 
         # copy over epsilon values
         ols_tree_node.epsilon = wrapped_tree_node.wrapped_node.epsilon
         ols_tree_node.count = (
-            wrapped_tree_node.z_value - _QUADTREE_FANOUT**node_level * node_F
-        ) / e_array[node_level - 1]
+            wrapped_tree_node.z_value - _QUADTREE_FANOUT**height * node_F
+        ) / e_array[height]
 
         for ols_child, wrapped_child in zip(
             ols_tree_node.children, wrapped_tree_node.children
