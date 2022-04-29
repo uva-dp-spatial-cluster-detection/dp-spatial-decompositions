@@ -61,7 +61,8 @@ def find_max_ebp_sweep(
 
 
 def ebp_scan_statistic(count_inside, baseline_inside) -> float:
-    """Computes the expectation-based Poisson scan statistic for a given region.
+    """Computes the log expectation-based Poisson scan statistic for a given region.
+    Logarithm is applied to the result to control for floating-point overflow.
 
     Reference: Neill, 2006. "Detection of Spatial and Spatio-Temporal Clusters."
 
@@ -74,8 +75,8 @@ def ebp_scan_statistic(count_inside, baseline_inside) -> float:
     """
 
     if count_inside > baseline_inside:
-        return (count_inside / baseline_inside) ** count_inside * np.exp(
+        return count_inside * np.log(count_inside / baseline_inside) + (
             baseline_inside - count_inside
         )
     else:
-        return 1
+        return 0  # = log(1)
