@@ -1,7 +1,6 @@
 """Tools for generating test data.
 """
 
-from turtle import shape
 from shapely import geometry
 import numpy as np
 import typing
