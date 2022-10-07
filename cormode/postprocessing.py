@@ -5,6 +5,8 @@ import typing
 from cormode.classical import QuadTreeNode
 from dataclasses import dataclass
 
+import numpy as np
+
 
 _QUADTREE_FANOUT = 4  # value of fanout for a quadtree
 
@@ -146,4 +148,16 @@ def build_ols_tree(tree: QuadTreeNode) -> QuadTreeNode:
             )
 
     compute_beta(ols_tree, wrapped_tree)
+
+    # sanity check: test invariant that node's count = sum of child counts
+    def sanity_check_counts(node):
+        DELTA = 0.001 # for floating point error
+        if node.is_leaf:
+            return
+        else:
+            child_sum = sum(child.count for child in node.children)
+            assert np.abs(child_sum - node.count) < DELTA, "Sum of child counts does not equal parent count"
+
+    sanity_check_counts(ols_tree)
+
     return ols_tree
